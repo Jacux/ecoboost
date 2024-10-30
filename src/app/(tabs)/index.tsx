@@ -1,15 +1,10 @@
-import { Image, StyleSheet, Platform } from "react-native";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { Image, StyleSheet, Platform, ScrollView, Text } from "react-native";
+
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+
 import Button from "@/components/button";
 import React, { useState, useEffect } from "react";
 import * as Location from "expo-location";
-
-interface Quote {
-  fact: string;
-}
 
 interface LocationData {
   coords: {
@@ -19,7 +14,7 @@ interface LocationData {
 }
 
 export default function HomeScreen() {
-  const [quote, setQuote] = useState<Quote>({ fact: "" });
+  const [quote, setQuote] = useState<object | null>(null);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -35,7 +30,7 @@ export default function HomeScreen() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setQuote({ fact: JSON.stringify(data) });
+        setQuote(data);
       })
       .catch((error) => console.error(error));
   };
@@ -63,34 +58,9 @@ export default function HomeScreen() {
   }
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView>
-        <ThemedText>{text}</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-        <Button
-          onPress={() => {
-            if (location) {
-              fetchData(location.coords.longitude, location.coords.latitude);
-            }
-          }}
-          title="Request"
-        />
-      </ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText>{quote.fact}</ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView style={{ backgroundColor: "F5F6FC" }}>
+      <Text style={[styles.text, styles.text2]}>{JSON.stringify(quote)}</Text>
+    </ScrollView>
   );
 }
 
@@ -110,5 +80,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: "absolute",
+  },
+  text: {
+    color: "red",
+  },
+  text2: {
+    fontSize: 15,
   },
 });

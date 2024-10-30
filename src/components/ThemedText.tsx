@@ -10,17 +10,12 @@ export type ThemedTextProps = TextProps & {
 
 export function ThemedText({
   style,
-  lightColor,
-  darkColor,
   type = "default",
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
   return (
     <Text
       style={[
-        { color },
         type === "default" ? styles.default : undefined,
         type === "title" ? styles.title : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
@@ -56,5 +51,32 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     fontSize: 16,
     color: "#0a7ea4",
+  },
+  poppinsThin: {
+    fontFamily: "Poppins_100Thin",
+  },
+  poppinsExtraLight: {
+    fontFamily: "Poppins_200ExtraLight",
+  },
+  poppinsLight: {
+    fontFamily: "Poppins_300Light",
+  },
+  poppinsRegular: {
+    fontFamily: "Poppins_400Regular",
+  },
+  poppinsMedium: {
+    fontFamily: "Poppins_500Medium",
+  },
+  poppinsSemiBold: {
+    fontFamily: "Poppins_600SemiBold",
+  },
+  poppinsBold: {
+    fontFamily: "Poppins_700Bold",
+  },
+  poppinsExtraBold: {
+    fontFamily: "Poppins_800ExtraBold",
+  },
+  poppinsBlack: {
+    fontFamily: "Poppins_900Black",
   },
 });
