@@ -8,7 +8,7 @@ import { ThemedText } from "@/components/ThemedText";
 export default function TabTwoScreen() {
   return (
     <ScrollView>
-      <ThemedText> Cwel2</ThemedText>
+      <ThemedText> trst2</ThemedText>
     </ScrollView>
   );
 }
