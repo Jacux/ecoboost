@@ -33,7 +33,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return authState?.authenticated ? (
+  return !authState?.authenticated ? (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -41,8 +41,9 @@ export default function RootLayout() {
       </Stack>
     </ThemeProvider>
   ) : (
-    <View>
-      <Text>Zaloguj się</Text>
-    </View>
+    <Stack>
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }
