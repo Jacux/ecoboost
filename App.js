@@ -31,7 +31,7 @@ const Layout = () => {
           },
         }}
       >
-        {authState?.authenticated ? (
+        {!authState?.authenticated ? (
           <Stack.Screen
             name="home"
             component={Home}
@@ -44,6 +44,7 @@ const Layout = () => {
         ) : (
           <Stack.Screen name="home" component={Login} />
         )}
+        <Stack.Screen name="login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
