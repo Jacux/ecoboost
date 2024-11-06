@@ -15,6 +15,7 @@ import Header from "../components/header";
 import Forecast from "../components/forecast";
 import { Link } from "expo-router";
 import { useState } from "react";
+import Daily from "../components/dailyQuest";
 
 const createTwoButtonAlert = () =>
   Alert.alert("Alert Title", "My Alert Msg", [
@@ -46,8 +47,8 @@ export default function Home({ navigation }) {
     <ScrollView>
       <View style={styles.container}>
         <Header name="Jacek" />
-        <Text>Test Home</Text>
         <Forecast />
+        <Daily />
         <Modal
           animationType="slide"
           transparent={true}
