@@ -1,7 +1,19 @@
 import { StyleSheet, Text, View, Button } from "react-native";
+import {useState, useEffect } from 'react';
 import Heading from "./heading";
 
-export default function Daily({ name }) {
+export default function Daily({ }) {
+    const [time, setTime] = useState('')
+    const calculateTime = () => {
+
+    }
+
+    useEffect(() => {
+        setTimeout(()=> {
+            setTime('test')
+        }, 1000)
+    }, [time])
+    
   return (
     <View style={styles.container}>
       <Heading>Codzienne zadanie</Heading>
@@ -12,6 +24,12 @@ export default function Daily({ name }) {
         </Text>
         <View style={styles.buttonContainer}>
           <Button style={styles.button} title="Wykonałeś zadanie?"></Button>
+          <View
+           style={styles.timeContainer}>
+{/* Ikona zegara*/}
+<Text style={styles.time}>{time}</Text>
+           </View>
+          
         </View>
       </View>
     </View>
