@@ -1,19 +1,17 @@
-import { StyleSheet, Text, View, Button } from "react-native";
-import {useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Button, Pressable } from "react-native";
+import { useState, useEffect } from "react";
 import Heading from "./heading";
 
-export default function Daily({ }) {
-    const [time, setTime] = useState('')
-    const calculateTime = () => {
+export default function Daily({}) {
+  const [time, setTime] = useState("");
+  const calculateTime = () => {};
 
-    }
+  useEffect(() => {
+    setTimeout(() => {
+      setTime("test");
+    }, 1000);
+  }, [time]);
 
-    useEffect(() => {
-        setTimeout(()=> {
-            setTime('test')
-        }, 1000)
-    }, [time])
-    
   return (
     <View style={styles.container}>
       <Heading>Codzienne zadanie</Heading>
@@ -23,13 +21,13 @@ export default function Daily({ }) {
           Nie wiem co tu dac oszczedzaj wode dzizecko drogie pls
         </Text>
         <View style={styles.buttonContainer}>
-          <Button style={styles.button} title="Wykonałeś zadanie?"></Button>
-          <View
-           style={styles.timeContainer}>
-{/* Ikona zegara*/}
-<Text style={styles.time}>{time}</Text>
-           </View>
-          
+          <Pressable style={styles.button}>
+            <Text style={styles.buttonText}>Wykonałeś zadanie?</Text>
+          </Pressable>
+          <View style={styles.timeContainer}>
+            {/* Ikona zegara*/}
+            <Text style={styles.time}>{time}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -48,6 +46,8 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 8,
     padding: 15,
+    display: "flex",
+    gap: 10,
   },
   heading: {
     color: "#2f2f2f",
@@ -60,6 +60,24 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
   },
   button: {
-    width: 40,
+    width: "50%",
+    backgroundColor: "#1B1B1B",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 7,
+    padding: 12,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Inter_500Medium",
+  },
+  buttonContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
   },
 });
