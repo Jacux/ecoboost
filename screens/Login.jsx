@@ -6,17 +6,29 @@ import {
   Button,
   Pressable,
 } from "react-native";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "../context/authContext";
 
 export default function Login({ navigation }) {
   const { onLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [passsword, setPassword] = useState("");
-
-  const login = () => {
+  const [errorMessage, setError] = useState(null);
+  const canClick = useRef(true);
+  const login = async () => {
+    if (!canClick.current) return;
+    console.log("click");
+    canClick.current = false;
     if (passsword != "" && email != "") {
-      console.log(onLogin(email, passsword));
+      let response = await onLogin(email, passsword);
+      if (response.status == false) {
+        setError(response.message);
+        canClick.current = true;
+      } else {
+        setError(null);
+      }
+    } else {
+      setError("Pola muszą być wypełnione");
     }
   };
   return (
@@ -26,17 +38,21 @@ export default function Login({ navigation }) {
       <TextInput
         style={styles.input}
         maxLength={255}
+        value={email}
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
       ></TextInput>
       <TextInput
         style={styles.input}
         maxLength={255}
+        value={passsword}
         placeholder="Hasło"
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
-
-      <Button onPress={login} title="Zaloguj się"></Button>
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+      <Pressable style={styles.button} onPress={login}>
+        <Text style={styles.buttonText}>Zaloguj się</Text>
+      </Pressable>
       <Pressable onPress={() => navigation.replace("register")}>
         <Text>Zarejestruj się</Text>
       </Pressable>
@@ -53,9 +69,29 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    margin: 12,
-    borderWidth: 1,
+    margin: 6,
+    borderWidth: 2,
     padding: 10,
     width: "80%",
+    borderRadius: 6,
+  },
+  button: {
+    width: "80%",
+    backgroundColor: "#1B1B1B",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 7,
+    padding: 12,
+
+    marginVertical: 10,
+  },
+  buttonText: {
+    fontSize: 14,
+    color: "#fff",
+    fontFamily: "Inter_500Medium",
+  },
+  error: {
+    color: "#f00",
   },
 });

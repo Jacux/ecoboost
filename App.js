@@ -7,7 +7,7 @@ import Home from "./screens/Home";
 import Login from "./screens/Login";
 import Register from "./screens/Register";
 import * as SplashScreen from "expo-splash-screen";
-
+import Settings from "./screens/Settings";
 import {
   useFonts,
   Inter_100Thin,
@@ -66,15 +66,10 @@ const Layout = () => {
         }}
       >
         {!authState?.authenticated ? (
-          <Stack.Screen
-            name="home"
-            component={Home}
-            options={{
-              headerRight: () => (
-                <Button title="Wyloguj się" onPress={onLogout}></Button>
-              ),
-            }}
-          />
+          <>
+            <Stack.Screen name="home" component={Home} />
+            <Stack.Screen name="settings" component={Settings} />
+          </>
         ) : (
           <>
             <Stack.Screen name="login" component={Login} />

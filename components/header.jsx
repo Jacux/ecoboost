@@ -11,7 +11,7 @@ export default function Header({ name }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    marginTop: 50,
   },
   helloMessage: {
     color: "#2f2f2f",

@@ -49,6 +49,10 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const login = async (email: string, password: string) => {
+    return {
+      status: false,
+      message: "Dane są niepoprawne",
+    };
     try {
       const result = await axios.post(`${API_URL}/auth`, {
         email,

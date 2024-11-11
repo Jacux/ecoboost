@@ -80,7 +80,9 @@ export default function Home({ navigation }) {
           <Text style={styles.textStyle}>Show Modal</Text>
         </Pressable>
         <StatusBar style="auto"></StatusBar>
-
+        <Pressable onPress={() => navigation.navigate("settings")}>
+          <Text>Settingsy</Text>
+        </Pressable>
         <Button title={"2-Button Alert"} onPress={createTwoButtonAlert} />
         <Button title={"3-Button Alert"} onPress={createThreeButtonAlert} />
       </View>
