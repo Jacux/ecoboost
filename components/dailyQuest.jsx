@@ -1,31 +1,66 @@
-import { StyleSheet, Text, View, Button, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useState, useEffect } from "react";
 import Heading from "./heading";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 export default function Daily({}) {
   const [time, setTime] = useState("");
-  const calculateTime = () => {};
+  const [finished, setFinished] = useState(false);
+
+  const calculateTime = () => {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+
+    const remainingTime = midnight - now;
+
+    const hours = Math.floor(remainingTime / (1000 * 60 * 60)) - 1;
+    const minutes = Math.floor(
+      (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      setTime("test");
+    const interval = setInterval(() => {
+      setTime(calculateTime());
     }, 1000);
-  }, [time]);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Heading>Codzienne zadanie</Heading>
+      <View style={styles.row}>
+        <Heading>Codzienne zadanie</Heading>
+        <View style={styles.streak}>
+          <Text style={styles.streakNumber}>2</Text>
+          <FontAwesome5 name="fire-alt" size={12} color="#fff" />
+        </View>
+      </View>
+
       <View style={styles.questContainer}>
         <Text style={styles.heading}>Codzienne Zadanie</Text>
         <Text style={styles.quest}>
           Nie wiem co tu dac oszczedzaj wode dzizecko drogie pls
         </Text>
         <View style={styles.buttonContainer}>
-          <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Wykonałeś zadanie?</Text>
+          <Pressable
+            style={styles.button}
+            onPress={() => {
+              console.log("click");
+            }}
+          >
+            <Text style={styles.buttonText}>
+              {finished ? "Zadanie Wykonane!" : "Wykonałeś zadanie?"}
+            </Text>
           </Pressable>
           <View style={styles.timeContainer}>
-            {/* Ikona zegara*/}
+            <AntDesign name="clockcircleo" size={24} color="black" />
             <Text style={styles.time}>{time}</Text>
           </View>
         </View>
@@ -43,11 +78,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: "#EDEDED",
     width: "100%",
-    height: 180,
     borderRadius: 8,
     padding: 15,
     display: "flex",
     gap: 10,
+    paddingVertical: 25,
   },
   heading: {
     color: "#2f2f2f",
@@ -79,5 +114,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 15,
+  },
+  timeContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  time: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  streak: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 3,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#1B1B1B",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  streakNumber: {
+    color: "#fff",
+    fontFamily: "Inter_700Bold",
+    fontSize: 13,
   },
 });

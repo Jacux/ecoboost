@@ -36,9 +36,9 @@ export default function Login({ navigation }) {
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
 
-      <Button onPress={login} title="Zaloguj się"></Button>
-      <Pressable onPress={() => navigation.replace("register")}>
-        <Text>Zarejestruj się</Text>
+      <Button onPress={login} title="Zarejestruj się"></Button>
+      <Pressable onPress={() => navigation.replace("login")}>
+        <Text>Zaloguj się</Text>
       </Pressable>
     </View>
   );

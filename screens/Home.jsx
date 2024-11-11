@@ -8,6 +8,7 @@ import {
   ScrollView,
   Pressable,
   Modal,
+  SafeAreaView,
 } from "react-native";
 
 import Heading from "../components/heading";
@@ -16,6 +17,7 @@ import Forecast from "../components/forecast";
 import { Link } from "expo-router";
 import { useState } from "react";
 import Daily from "../components/dailyQuest";
+import BikeMap from "../components/bikeMap";
 
 const createTwoButtonAlert = () =>
   Alert.alert("Alert Title", "My Alert Msg", [
@@ -44,11 +46,12 @@ const createThreeButtonAlert = () =>
 export default function Home({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
-    <ScrollView>
+    <ScrollView overScrollMode="never" showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Header name="Jacek" />
         <Forecast />
         <Daily />
+
         <Modal
           animationType="slide"
           transparent={true}
@@ -77,10 +80,7 @@ export default function Home({ navigation }) {
           <Text style={styles.textStyle}>Show Modal</Text>
         </Pressable>
         <StatusBar style="auto"></StatusBar>
-        <Button
-          title="test Nawigacji"
-          onPress={() => navigation.navigate("login", { name: "Jane" })}
-        />
+
         <Button title={"2-Button Alert"} onPress={createTwoButtonAlert} />
         <Button title={"3-Button Alert"} onPress={createThreeButtonAlert} />
       </View>

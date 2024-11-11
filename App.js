@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
+import Register from "./screens/Register";
 import * as SplashScreen from "expo-splash-screen";
 
 import {
@@ -59,14 +60,9 @@ const Layout = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        //initialRouteName="register"
         screenOptions={{
-          headerStyle: {
-            backgroundColor: "#f4511e",
-          },
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
+          headerShown: false,
         }}
       >
         {!authState?.authenticated ? (
@@ -80,19 +76,12 @@ const Layout = () => {
             }}
           />
         ) : (
-          <Stack.Screen name="home" component={Login} />
+          <>
+            <Stack.Screen name="login" component={Login} />
+            <Stack.Screen name="register" component={Register} />
+          </>
         )}
-        <Stack.Screen name="login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

@@ -13,7 +13,8 @@ import axios from "axios";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 const windowWidth = Dimensions.get("window").width;
-
+import aqiLevels from "../constant/aqiLevels";
+import AntDesign from "@expo/vector-icons/AntDesign";
 export default function Forecast() {
   const [location, setLocation] = useState(null);
   const [ready, setIsReady] = useState(false);
@@ -30,22 +31,38 @@ export default function Forecast() {
     let location = await Location.getCurrentPositionAsync({});
 
     let coords = location.coords;
-    const apiUrl = `http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
-
-    console.log("fetch");
+    const pollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
+    const forecastApi = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&hourly=temperature_2m&timezone=Europe%2FBerlin&forecast_days=1`;
+    console.log(forecastApi);
     try {
-      const response = await axios.get(apiUrl);
-      console.log("fetched");
+      const pollution = await axios.get(pollutionUrl);
+      const forecast = await axios.get(forecastApi);
       setIsReady(true);
-      const today = new Date().toDateString();
+      const date = new Date();
+      date.setHours(date.getHours() + 1);
+      const today = date.toDateString();
 
-      // Filtrowanie prognozy dla dzisiejszej daty
-      const todayForecast = response.data.list.filter((item) => {
-        const itemDate = new Date(item.dt * 1000).toDateString();
-        return itemDate === today;
+      const todayPollution = pollution.data.list.filter((item) => {
+        const itemDate = new Date(item.dt * 1000);
+        let hour = itemDate.getHours();
+
+        return itemDate.toDateString() === today && hour >= date.getHours();
       });
 
-      setForecastData(todayForecast);
+      const newData = todayPollution.map((item) => {
+        const tempDate = new Date(item.dt * 1000).toISOString().slice(0, 16);
+
+        for (let i = 0; i < forecast.data.hourly.time.length; i++) {
+          if (tempDate == forecast.data.hourly.time[i]) {
+            return {
+              ...item,
+              temp: Math.round(forecast.data.hourly.temperature_2m[i]),
+            };
+          }
+        }
+      });
+
+      setForecastData(newData);
     } catch (error) {
       console.error("Error fetching solar data:", error);
     }
@@ -53,14 +70,6 @@ export default function Forecast() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const aqiLevels = [
-    "Dobre",
-    "Umiarkowane",
-    "Średnie",
-    "Słabe",
-    "Bardzo słabe",
-  ];
   if (errorMessage) {
     return (
       <View style={styles.container}>
@@ -76,7 +85,6 @@ export default function Forecast() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.forecast}>
               {forecastData.map((item, index) => {
-                // Przeliczamy dt na datę z godziną
                 const date = new Date(item.dt * 1000);
                 const formattedDate = date.toLocaleDateString("pl-PL", {
                   day: "numeric",
@@ -85,22 +93,18 @@ export default function Forecast() {
                   minute: "2-digit",
                 });
 
-                // Pobieramy poziom AQI
                 const aqi = aqiLevels[item.main.aqi - 1];
 
                 return (
                   <View key={index} style={styles.forecastContainer}>
                     <View style={styles.forecastHeader}>
-                      <Image
-                        style={{ width: 40, height: 40 }}
-                        source={{
-                          uri: "https://openweathermap.org/img/wn/01d@2x.png",
-                        }}
-                      />
+                      <AntDesign name="calendar" size={24} color="black" />
                       <Text style={styles.date}>{formattedDate}</Text>
                     </View>
                     <View style={styles.forecastData}>
-                      <Text style={styles.temperature}>18°C</Text>
+                      <Text style={styles.temperature}>
+                        {item.temp + "°C" || "błąd"}
+                      </Text>
                       <Text style={styles.forecastText}>Stan powietrza:</Text>
                       <Text style={styles.forecastCondition}>{aqi}</Text>
                     </View>
@@ -125,7 +129,7 @@ const styles = StyleSheet.create({
   },
 
   forecastContainer: {
-    width: windowWidth * 0.45,
+    width: windowWidth * 0.5,
     backgroundColor: "#EDEDED",
     height: 170,
     borderRadius: 6,
@@ -151,6 +155,7 @@ const styles = StyleSheet.create({
   },
   forecastText: {
     fontSize: 14,
+    color: "#888888",
     fontFamily: "Inter_500Medium",
   },
   forecastCondition: {
