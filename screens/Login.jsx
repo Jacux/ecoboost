@@ -21,11 +21,12 @@ export default function Login({ navigation }) {
     canClick.current = false;
     if (passsword != "" && email != "") {
       let response = await onLogin(email, passsword);
+      console.log(response);
       if (response.status == false) {
         setError(response.message);
         canClick.current = true;
       } else {
-        setError(null);
+        setError(response.message);
       }
     } else {
       setError("Pola muszą być wypełnione");

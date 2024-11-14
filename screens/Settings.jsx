@@ -28,7 +28,7 @@ export default function Settings({ navigation }) {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()}>
+          <Pressable style={styles.press} onPress={() => navigation.goBack()}>
             <AntDesign name="arrowleft" size={22} color="black" />
           </Pressable>
           <Heading>Ustawienia</Heading>
@@ -37,9 +37,18 @@ export default function Settings({ navigation }) {
         <Picker
           style={styles.picker}
           selectedValue={selectedLanguage}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedLanguage(itemValue)
-          }
+          onValueChange={(itemValue, itemIndex) => {
+            setSelectedLanguage("dg");
+            Alert.alert(
+              "Opcja Testowa",
+              "Jest to jedynie prototyp tej opcji. Niestety obecnie jedynym regionem jest Dąbrowa Górnicza",
+              [
+                {
+                  text: "Rozumiem",
+                },
+              ]
+            );
+          }}
         >
           <Picker.Item label="Dąbrowa Górnicza" value="dg" />
           <Picker.Item label="Sosnowiec" value="sos" />
@@ -91,5 +100,10 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#EDEDED",
     borderRadius: 6,
+  },
+  press: {
+    paddingRight: 15,
+    paddingBottom: 15,
+    paddingTop: 15,
   },
 });

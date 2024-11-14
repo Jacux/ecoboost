@@ -1,11 +1,56 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useState, useEffect } from "react";
 import Heading from "./heading";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import axios from "axios";
+
 export default function Daily({}) {
   const [time, setTime] = useState("");
-  const [finished, setFinished] = useState(false);
+  const [finished, setFinished] = useState(null);
+
+  const fetchData = async () => {
+    if (axios.defaults.headers.common["Authorization"] == null) {
+      return fetchData();
+    }
+    const response = await axios.get(
+      "https://projekt-server.vercel.app/checkQuest"
+    );
+
+    setFinished(response.data.status);
+  };
+
+  const onClick = () => {
+    if (!finished) {
+      Alert.alert("Codzinnie Zadanie", "Czy wykonałeś codzienne zadanie?", [
+        {
+          text: "Nie",
+          style: "cancel",
+        },
+        {
+          text: "Tak",
+          onPress: async () => {
+            try {
+              let response = await axios.post(
+                "https://projekt-server.vercel.app/addDoneQuest"
+              );
+              console.log(response.data);
+              fetchData();
+            } catch (e) {
+              console.error(e);
+            }
+          },
+        },
+      ]);
+    }
+  };
 
   const calculateTime = () => {
     const now = new Date();
@@ -14,7 +59,7 @@ export default function Daily({}) {
 
     const remainingTime = midnight - now;
 
-    const hours = Math.floor(remainingTime / (1000 * 60 * 60)) - 1;
+    const hours = Math.floor(remainingTime / (1000 * 60 * 60));
     const minutes = Math.floor(
       (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
     );
@@ -33,6 +78,10 @@ export default function Daily({}) {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -42,29 +91,35 @@ export default function Daily({}) {
           <FontAwesome5 name="fire-alt" size={12} color="#fff" />
         </View>
       </View>
+      {finished === null ? (
+        <ActivityIndicator style={styles.indicator} size="big" color="#000" />
+      ) : (
+        <View style={styles.questContainer}>
+          <Text style={styles.heading}>
+            {finished ? "Dziękujemy!" : " Codzienne Zadanie"}
+          </Text>
 
-      <View style={styles.questContainer}>
-        <Text style={styles.heading}>Codzienne Zadanie</Text>
-        <Text style={styles.quest}>
-          Nie wiem co tu dac oszczedzaj wode dzizecko drogie pls
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.button}
-            onPress={() => {
-              console.log("click");
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {finished ? "Zadanie Wykonane!" : "Wykonałeś zadanie?"}
+          {finished ? (
+            <Text style={styles.quest}>Jutro pojawi się nowe zadanie</Text>
+          ) : (
+            <Text style={styles.quest}>
+              Nie wiem co tu dac oszczedzaj wode dzizecko drogie pls
             </Text>
-          </Pressable>
-          <View style={styles.timeContainer}>
-            <AntDesign name="clockcircleo" size={24} color="black" />
-            <Text style={styles.time}>{time}</Text>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <Pressable style={styles.button} onPress={onClick}>
+              <Text style={styles.buttonText}>
+                {finished ? "Zadanie Wykonane!" : "Wykonałeś zadanie?"}
+              </Text>
+            </Pressable>
+            <View style={styles.timeContainer}>
+              <AntDesign name="clockcircleo" size={24} color="black" />
+              <Text style={styles.time}>{time}</Text>
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -95,13 +150,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
   },
   button: {
-    width: "50%",
+    width: "auto",
     backgroundColor: "#1B1B1B",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 7,
-    padding: 12,
+    padding: 15,
   },
   buttonText: {
     color: "#fff",
@@ -122,7 +177,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   time: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
     color: "#333",
   },
@@ -147,5 +202,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Inter_700Bold",
     fontSize: 13,
+  },
+  indicator: {
+    marginTop: 25,
   },
 });

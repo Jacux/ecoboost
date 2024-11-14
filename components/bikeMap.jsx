@@ -1,39 +1,66 @@
-import { StyleSheet, Text, View, Button, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
+
 import { useState, useEffect } from "react";
 import Heading from "./heading";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import * as Location from "expo-location";
 import { UrlTile } from "react-native-maps";
 export default function BikeMap({}) {
-  const [time, setTime] = useState("");
-  const calculateTime = () => {};
+  const [coords, setCoords] = useState(null);
+
+  const fetchLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setError("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    let coords = location.coords;
+    console.log(coords);
+    setCoords(coords);
+  };
+
+  const fetchData = async () => {
+    const locations = await axios.get(
+      "https://api-gateway.nextbike.pl/api/maps/service/zz/locations"
+    )[0];
+    const myLocations = locations.cities.find((element) => {
+      element.name == "Dąbrowa Górnicza (GZM)";
+    });
+    console.log(myLocations);
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      setTime("test");
-    }, 1000);
-  }, [time]);
-
+    fetchLocation();
+    fetchData();
+  }, []);
   return (
     <View style={styles.container}>
       <Heading>A może rower?</Heading>
       <Text style={styles.text}>Ponad 210 rowerów w twojej okolicy</Text>
-
-      <MapView
-        style={({ flex: 1 }, styles.map)}
-        initialRegion={{
-          latitude: 50.1124,
-          longitude: 18.9972,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
-        mapType="none"
-      >
-        <UrlTile
-          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          tileSize={256}
-        />
-      </MapView>
+      {coords !== null ? (
+        <MapView
+          showsUserLocation={true}
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          initialRegion={{
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+        ></MapView>
+      ) : (
+        <ActivityIndicator size="big" color="#1b1b1b"></ActivityIndicator>
+      )}
     </View>
   );
 }
@@ -53,5 +80,6 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: 200,
+    marginTop: 20,
   },
 });

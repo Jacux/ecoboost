@@ -1,9 +1,19 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 
-export default function Header({ name }) {
+import Feather from "@expo/vector-icons/Feather";
+import { useEffect, useState } from "react";
+export default function Header({ name, navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.helloMessage}>Witaj {name}👋</Text>
+      <View style={styles.flex}>
+        <Text style={styles.helloMessage}>Witaj {name}👋</Text>
+        <Pressable
+          style={styles.press}
+          onPress={() => navigation.navigate("settings")}
+        >
+          <Feather name="settings" size={24} color="black" />
+        </Pressable>
+      </View>
       <Text style={styles.description}>Gotowy odmienić świat?</Text>
     </View>
   );
@@ -22,5 +32,15 @@ const styles = StyleSheet.create({
     color: "#888888",
     fontSize: 16,
     fontFamily: "Inter_600SemiBold",
+  },
+  flex: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    justifyContent: "space-between",
+  },
+  press: {
+    padding: 20,
   },
 });

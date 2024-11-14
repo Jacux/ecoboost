@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import Heading from "./heading";
 import { Dimensions } from "react-native";
@@ -15,8 +16,7 @@ import { useState, useEffect } from "react";
 const windowWidth = Dimensions.get("window").width;
 import aqiLevels from "../constant/aqiLevels";
 import AntDesign from "@expo/vector-icons/AntDesign";
-export default function Forecast() {
-  const [location, setLocation] = useState(null);
+export default function Forecast({ openModal }) {
   const [ready, setIsReady] = useState(false);
   const [errorMessage, setError] = useState(null);
   const [forecastData, setForecastData] = useState([]);
@@ -38,22 +38,26 @@ export default function Forecast() {
       const pollution = await axios.get(pollutionUrl);
       const forecast = await axios.get(forecastApi);
       setIsReady(true);
-      const date = new Date();
-      date.setHours(date.getHours() + 1);
-      const today = date.toDateString();
 
+      const date = new Date();
+      const today = date.toDateString();
       const todayPollution = pollution.data.list.filter((item) => {
         const itemDate = new Date(item.dt * 1000);
-        let hour = itemDate.getHours();
 
-        return itemDate.toDateString() === today && hour >= date.getHours();
+        const itemDateString = itemDate.toDateString();
+        const itemHour = itemDate.getHours();
+        console.log(itemHour);
+        return (
+          (itemDateString === today && itemHour >= date.getHours()) ||
+          itemHour == 0
+        );
       });
 
       const newData = todayPollution.map((item) => {
         const tempDate = new Date(item.dt * 1000).toISOString().slice(0, 16);
 
         for (let i = 0; i < forecast.data.hourly.time.length; i++) {
-          if (tempDate == forecast.data.hourly.time[i]) {
+          if (tempDate === forecast.data.hourly.time[i]) {
             return {
               ...item,
               temp: Math.round(forecast.data.hourly.temperature_2m[i]),
@@ -64,7 +68,7 @@ export default function Forecast() {
 
       setForecastData(newData);
     } catch (error) {
-      console.error("Error fetching solar data:", error);
+      //console.error("Error fetching solar data:", error);
     }
   };
   useEffect(() => {
@@ -85,31 +89,41 @@ export default function Forecast() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.forecast}>
               {forecastData.map((item, index) => {
-                const date = new Date(item.dt * 1000);
-                const formattedDate = date.toLocaleDateString("pl-PL", {
-                  day: "numeric",
-                  month: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                if (item != null) {
+                  const date = new Date(item.dt * 1000);
+                  date.setHours(date.getHours() - 1);
+                  const formattedDate = date.toLocaleDateString("pl-PL", {
+                    day: "numeric",
+                    month: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
 
-                const aqi = aqiLevels[item.main.aqi - 1];
+                  const aqi = aqiLevels[item.main.aqi - 1];
 
-                return (
-                  <View key={index} style={styles.forecastContainer}>
-                    <View style={styles.forecastHeader}>
-                      <AntDesign name="calendar" size={24} color="black" />
-                      <Text style={styles.date}>{formattedDate}</Text>
-                    </View>
-                    <View style={styles.forecastData}>
-                      <Text style={styles.temperature}>
-                        {item.temp + "°C" || "błąd"}
-                      </Text>
-                      <Text style={styles.forecastText}>Stan powietrza:</Text>
-                      <Text style={styles.forecastCondition}>{aqi}</Text>
-                    </View>
-                  </View>
-                );
+                  return (
+                    <Pressable
+                      onPress={() => openModal(forecastData[index].components)}
+                      key={index}
+                    >
+                      <View style={styles.forecastContainer}>
+                        <View style={styles.forecastHeader}>
+                          <AntDesign name="calendar" size={24} color="black" />
+                          <Text style={styles.date}>{formattedDate}</Text>
+                        </View>
+                        <View style={styles.forecastData}>
+                          <Text style={styles.temperature}>
+                            {item.temp + "°C" || "błąd"}
+                          </Text>
+                          <Text style={styles.forecastText}>
+                            Stan powietrza:
+                          </Text>
+                          <Text style={styles.forecastCondition}>{aqi}</Text>
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+                }
               })}
             </View>
           </ScrollView>
@@ -129,7 +143,7 @@ const styles = StyleSheet.create({
   },
 
   forecastContainer: {
-    width: windowWidth * 0.5,
+    width: windowWidth * 0.6,
     backgroundColor: "#EDEDED",
     height: 170,
     borderRadius: 6,

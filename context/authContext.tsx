@@ -11,7 +11,7 @@ interface AuthProps {
 
 const TOKEN_KEY = "my-jwt";
 
-export const API_URL = "http://localhost:3000";
+export const API_URL = "https://projekt-server.vercel.app";
 
 const AuthContext = createContext<AuthProps>({});
 
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: any) => {
   useEffect(() => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
-
+      console.log(token);
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
@@ -38,26 +38,47 @@ export const AuthProvider = ({ children }: any) => {
         });
       }
     };
+    loadToken();
   }, []);
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      return await axios.post(`${API_URL}/register`, { name, email, password });
+      console.log(name, password, email);
+      console.log(`${API_URL}/createUser`);
+      let response = await axios.post(`${API_URL}/createUser`, {
+        name: name,
+        email: email,
+        password: password,
+      });
+      console.log(response.data);
+      if (response.data.status) {
+        setAuthState({
+          token: response.data.token,
+          authenticated: true,
+        });
+        await SecureStore.setItemAsync(TOKEN_KEY, response.data.token);
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${response.data.token}`;
+      }
+      return response;
     } catch (e) {
+      console.error("Error response:", e);
+      const errorMessage = (e as any)?.response?.data?.msg || "Unknown error";
+      console.log(errorMessage);
       return { error: true, msg: (e as any).response.data.msg };
     }
   };
 
   const login = async (email: string, password: string) => {
-    return {
-      status: false,
-      message: "Dane są niepoprawne",
-    };
     try {
-      const result = await axios.post(`${API_URL}/auth`, {
-        email,
-        password,
+      console.log(password, email);
+      console.log(`${API_URL}/loginUser`);
+      const result = await axios.post(`${API_URL}/loginUser`, {
+        email: email,
+        password: password,
       });
+      console.log(result);
       setAuthState({
         token: result.data.token,
         authenticated: true,
@@ -71,7 +92,7 @@ export const AuthProvider = ({ children }: any) => {
 
       return result;
     } catch (e) {
-      return { error: true, msg: (e as any).response.data.msg };
+      return { error: true, message: (e as any).response.data.message };
     }
   };
 

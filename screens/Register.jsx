@@ -10,15 +10,15 @@ import { useState } from "react";
 import { useAuth } from "../context/authContext";
 
 export default function Register({ navigation }) {
-  const { onLogin } = useAuth();
+  const { onRegister } = useAuth();
   const [email, setEmail] = useState("");
-  const [passsword, setPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [errorMessage, setError] = useState(null);
 
-  const login = () => {
-    if (passsword != "" && email != "") {
-      console.log(onLogin(email, passsword));
+  const login = async () => {
+    if (password != "" && email != "") {
+      await onRegister(name, email, password);
       setError(null);
     } else {
       setError("Pola muszą być wypełnione");
@@ -26,7 +26,6 @@ export default function Register({ navigation }) {
   };
   return (
     <View style={styles.container}>
-      {/*Tu bedzie logo*/}
       <Text>EcoBoost</Text>
       <TextInput
         style={styles.input}
@@ -45,13 +44,13 @@ export default function Register({ navigation }) {
       <TextInput
         style={styles.input}
         maxLength={255}
-        value={passsword}
+        value={password}
         placeholder="Hasło"
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
       <Pressable style={styles.button} onPress={login}>
-        <Text style={styles.buttonText}>Zaloguj się</Text>
+        <Text style={styles.buttonText}>Zarejestruj się</Text>
       </Pressable>
       <Pressable onPress={() => navigation.replace("login")}>
         <Text>Zaloguj się</Text>

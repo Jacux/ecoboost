@@ -65,7 +65,7 @@ const Layout = () => {
           headerShown: false,
         }}
       >
-        {!authState?.authenticated ? (
+        {authState?.authenticated ? (
           <>
             <Stack.Screen name="home" component={Home} />
             <Stack.Screen name="settings" component={Settings} />
