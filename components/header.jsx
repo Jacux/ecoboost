@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   description: {
-    color: "#888888",
+    color: "#444545",
     fontSize: 16,
     fontFamily: "Inter_600SemiBold",
   },

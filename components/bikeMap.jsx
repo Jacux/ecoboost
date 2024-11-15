@@ -1,51 +1,77 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
-
-import { useState, useEffect } from "react";
-import Heading from "./heading";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import React, { useState, useEffect } from "react";
+import { View, Text, ActivityIndicator, Image } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { UrlTile } from "react-native-maps";
-export default function BikeMap({}) {
+import axios from "axios";
+import { PROVIDER_GOOGLE } from "react-native-maps";
+import Heading from "./heading";
+
+const BikeMap = () => {
   const [coords, setCoords] = useState(null);
+  const [bikeCoordinates, setBikeCoordinates] = useState([]); // Store bike coordinates
+  const [bikeCount, setCount] = useState(0);
 
   const fetchLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      setError("Permission to access location was denied");
+      console.log("Permission to access location was denied");
       return;
     }
 
     let location = await Location.getCurrentPositionAsync({});
     let coords = location.coords;
-    console.log(coords);
+
     setCoords(coords);
   };
 
   const fetchData = async () => {
-    const locations = await axios.get(
+    const response = await axios.get(
       "https://api-gateway.nextbike.pl/api/maps/service/zz/locations"
-    )[0];
-    const myLocations = locations.cities.find((element) => {
-      element.name == "Dąbrowa Górnicza (GZM)";
-    });
-    console.log(myLocations);
+    );
+
+    const cities = response.data[0]?.cities || [];
+    let count = 0;
+
+    const myLocation = cities.find(
+      (city) => city.name === "Dąbrowa Górnicza (GZM)"
+    );
+
+    if (myLocation) {
+      const places = myLocation.places;
+
+      const newBikeCoordinates = [];
+
+      // Loop through each place
+      places.forEach((place) => {
+        place.bikes.forEach((bike) => {
+          newBikeCoordinates.push({
+            bikeNumber: bike.number,
+            bikeType: bike.bikeType,
+            lat: place.geoCoords.lat,
+            lng: place.geoCoords.lng,
+          });
+        });
+
+        count += place.bikes.length;
+      });
+
+      setBikeCoordinates(newBikeCoordinates);
+      setCount(count);
+    } else {
+    }
   };
 
   useEffect(() => {
     fetchLocation();
     fetchData();
   }, []);
+
   return (
     <View style={styles.container}>
       <Heading>A może rower?</Heading>
-      <Text style={styles.text}>Ponad 210 rowerów w twojej okolicy</Text>
+      <Text style={styles.text}>
+        Ponad {bikeCount} rowerów w twojej okolicy
+      </Text>
       {coords !== null ? (
         <MapView
           showsUserLocation={true}
@@ -57,29 +83,50 @@ export default function BikeMap({}) {
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
-        ></MapView>
+        >
+          {bikeCoordinates.map((bike, index) => (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: bike.lat,
+                longitude: bike.lng,
+              }}
+              style={{ height: 35, width: 35 }}
+              title="Strefa Rowerowa"
+              tracksViewChanges={false}
+            >
+              <Image
+                source={require("../assets/bicycle.png")}
+                style={{ width: 26, height: 28 }}
+                resizeMode="contain"
+                s
+              />
+            </Marker>
+          ))}
+        </MapView>
       ) : (
-        <ActivityIndicator size="big" color="#1b1b1b"></ActivityIndicator>
+        <ActivityIndicator size="large" color="#1b1b1b" />
       )}
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
-    marginTop: 20,
+    justifyContent: "center",
+    alignItems: "left",
     paddingRight: 15,
-    marginBottom: 100,
   },
   text: {
-    color: "#888888",
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontSize: 18,
+    marginBottom: 20,
   },
   map: {
     width: "100%",
-    height: 200,
-    marginTop: 20,
+    height: 300,
+    marginBottom: 50,
   },
-});
+};
+
+export default BikeMap;

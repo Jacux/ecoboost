@@ -60,7 +60,6 @@ const Layout = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        //initialRouteName="register"
         screenOptions={{
           headerShown: false,
         }}

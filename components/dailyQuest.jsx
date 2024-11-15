@@ -103,7 +103,7 @@ export default function Daily({}) {
             <Text style={styles.quest}>Jutro pojawi się nowe zadanie</Text>
           ) : (
             <Text style={styles.quest}>
-              Nie wiem co tu dac oszczedzaj wode dzizecko drogie pls
+              Ogranicz spaliny. Do końca dnia nie używaj samochodu osobistego.
             </Text>
           )}
 
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   questContainer: {
     marginTop: 10,
-    backgroundColor: "#EDEDED",
+    backgroundColor: "#EDFCF2",
     width: "100%",
     borderRadius: 8,
     padding: 15,
@@ -145,13 +145,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
   },
   quest: {
-    color: "#888888",
+    color: "#444545",
     fontSize: 13,
     fontFamily: "Inter_500Medium",
   },
   button: {
     width: "auto",
-    backgroundColor: "#1B1B1B",
+    backgroundColor: "#16b364",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     gap: 3,
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "#1B1B1B",
+    backgroundColor: "#16b364",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 6,

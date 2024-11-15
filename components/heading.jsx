@@ -6,7 +6,7 @@ export default function Heading({ children }) {
 
 const styles = StyleSheet.create({
   heading: {
-    color: "2f2f2f",
+    color: "#2f2f2f",
     fontSize: 17,
     fontFamily: "Inter_600SemiBold",
   },

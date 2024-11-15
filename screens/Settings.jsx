@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    backgroundColor: "#1B1B1B",
+    backgroundColor: "#16b364",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: "100%",
-    backgroundColor: "#EDEDED",
+    backgroundColor: "#EDFCF2",
     borderRadius: 6,
   },
   press: {

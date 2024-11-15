@@ -59,7 +59,7 @@ export default function Home({ navigation }) {
         <Header name={name} navigation={navigation} />
         <Forecast openModal={openModal} />
         <Daily />
-
+        <BikeMap />
         <Modal
           animationType="slide"
           transparent={true}
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
 
     padding: 15,
-    backgroundColor: "#1B1B1B",
+    backgroundColor: "#16b364",
     borderRadius: 6,
     color: "#fff",
     textAlign: "center",

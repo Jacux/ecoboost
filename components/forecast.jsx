@@ -33,7 +33,7 @@ export default function Forecast({ openModal }) {
     let coords = location.coords;
     const pollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
     const forecastApi = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&hourly=temperature_2m&timezone=Europe%2FBerlin&forecast_days=1`;
-    console.log(forecastApi);
+
     try {
       const pollution = await axios.get(pollutionUrl);
       const forecast = await axios.get(forecastApi);
@@ -46,7 +46,7 @@ export default function Forecast({ openModal }) {
 
         const itemDateString = itemDate.toDateString();
         const itemHour = itemDate.getHours();
-        console.log(itemHour);
+
         return (
           (itemDateString === today && itemHour >= date.getHours()) ||
           itemHour == 0
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
 
   forecastContainer: {
     width: windowWidth * 0.6,
-    backgroundColor: "#EDEDED",
+    backgroundColor: "#EDFCF2",
     height: 170,
     borderRadius: 6,
     padding: 10,
@@ -169,14 +169,14 @@ const styles = StyleSheet.create({
   },
   forecastText: {
     fontSize: 14,
-    color: "#888888",
+    color: "#444545",
     fontFamily: "Inter_500Medium",
   },
   forecastCondition: {
     padding: 10,
     display: "flex",
     width: "100%",
-    backgroundColor: "#1B1B1B",
+    backgroundColor: "#16b364",
     textAlign: "center",
     borderRadius: 7,
     color: "#fff",
