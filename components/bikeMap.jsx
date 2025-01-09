@@ -41,7 +41,7 @@ const BikeMap = () => {
 
       const newBikeCoordinates = [];
 
-      // Loop through each place
+     
       places.forEach((place) => {
         place.bikes.forEach((bike) => {
           newBikeCoordinates.push({
