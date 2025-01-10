@@ -19,95 +19,93 @@ const BikeMap = () => {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    let coords = location.coords;
-
-    setCoords(coords);
+    setCoords(location.coords);
   };
 
   const fetchData = async () => {
-    const response = await axios.get(
-      "https://api-gateway.nextbike.pl/api/maps/service/zz/locations"
-    );
+    try {
+      const response = await axios.get(
+          "https://api-gateway.nextbike.pl/api/maps/service/zz/locations"
+      );
 
-    const cities = response.data[0]?.cities || [];
-    let count = 0;
+      const cities = response.data[0]?.cities || [];
+      let count = 0;
 
-    const myLocation = cities.find(
-      (city) => city.name === "Dąbrowa Górnicza (GZM)"
-    );
+      const myLocation = cities.find(
+          (city) => city.name === "Dąbrowa Górnicza (GZM)"
+      );
 
-    if (myLocation) {
-      const places = myLocation.places;
+      if (myLocation) {
+        const places = myLocation.places;
 
-      const newBikeCoordinates = [];
-
-     
-      places.forEach((place) => {
-        place.bikes.forEach((bike) => {
-          newBikeCoordinates.push({
-            bikeNumber: bike.number,
-            bikeType: bike.bikeType,
-            lat: place.geoCoords.lat,
-            lng: place.geoCoords.lng,
+        const newBikeCoordinates = [];
+        places.forEach((place) => {
+          place.bikes.forEach((bike) => {
+            newBikeCoordinates.push({
+              bikeNumber: bike.number,
+              bikeType: bike.bikeType,
+              lat: place.geoCoords.lat,
+              lng: place.geoCoords.lng,
+            });
           });
+
+          count += place.bikes.length;
         });
 
-        count += place.bikes.length;
-      });
-
-      setBikeCoordinates(newBikeCoordinates);
-      setCount(count);
-    } else {
+        setBikeCoordinates(newBikeCoordinates);
+        setCount(count);
+      }
+    } catch (error) {
+      console.log("Error fetching bike data:", error);
     }
   };
 
   useEffect(() => {
-    fetchLocation();
-    fetchData();
+    const fetchDataAsync = async () => {
+      await fetchLocation();
+      await fetchData();
+    };
+
+    fetchDataAsync();
   }, []);
 
+  if (coords === null || bikeCoordinates.length === 0) {
+    return <ActivityIndicator size="large" color="#1b1b1b" />;
+  }
+
   return (
-    <View style={styles.container}>
-      <Heading>A może rower?</Heading>
-      <Text style={styles.text}>
-        Ponad {bikeCount} rowerów w twojej okolicy
-      </Text>
-      {coords !== null ? (
+      <View style={styles.container}>
+        <Heading>A może rower?</Heading>
+        <Text style={styles.text}>
+          Ponad {bikeCount} rowerów w twojej okolicy
+        </Text>
         <MapView
-          showsUserLocation={true}
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          initialRegion={{
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
+            showsUserLocation={true}
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            initialRegion={{
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
         >
-          {bikeCoordinates.map((bike, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: bike.lat,
-                longitude: bike.lng,
-              }}
-              style={{ height: 35, width: 35 }}
-              title="Strefa Rowerowa"
-              tracksViewChanges={false}
-            >
-              <Image
-                source={require("../assets/bicycle.png")}
-                style={{ width: 26, height: 28 }}
-                resizeMode="contain"
-                s
+          {bikeCoordinates.map((bike) => (
+              <Marker
+                  key={bike.bikeNumber}
+                  coordinate={{
+                    latitude: bike.lat,
+                    longitude: bike.lng,
+                  }}
+                  icon={require('@/assets/images/bicycle.png')}
+                  title="Strefa Rowerowa"
+                  tracksViewChanges={false}
               />
-            </Marker>
+
+
           ))}
         </MapView>
-      ) : (
-        <ActivityIndicator size="large" color="#1b1b1b" />
-      )}
-    </View>
+      </View>
   );
 };
 
@@ -115,7 +113,7 @@ const styles = {
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "left",
+    alignItems: "flex-start",
     paddingRight: 15,
   },
   text: {

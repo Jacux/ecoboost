@@ -11,25 +11,36 @@ import Heading from "./heading";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import axios from "axios";
+import {useAuth} from "../context/authContext";
+import {router} from "expo-router";
 
-export default function Daily({}) {
+export default function Daily() {
+  const {authState} = useAuth()
   const [time, setTime] = useState("");
   const [finished, setFinished] = useState(null);
-
+  // Pobieranie danych z API
   const fetchData = async () => {
-    if (axios.defaults.headers.common["Authorization"] == null) {
-      return fetchData();
-    }
-    const response = await axios.get(
-      "https://projekt-server.vercel.app/checkQuest"
-    );
+    try {
+      if (!axios.defaults.headers.common["Authorization"]) {
+        console.warn("Brak nagłówka Authorization. Sprawdź logikę autoryzacji.");
 
-    setFinished(response.data.status);
+        return;
+      }
+      const response = await axios.get(
+          "https://projekt-server-jacuxs-projects.vercel.app/checkQuest"
+      );
+      console.log("Dane z fetchData:", response.data);
+      setFinished(response.data.status ?? false);
+    } catch (error) {
+      console.error("Błąd w fetchData:", error);
+      Alert.alert("Błąd", "Nie udało się pobrać danych z serwera.");
+    }
   };
+
 
   const onClick = () => {
     if (!finished) {
-      Alert.alert("Codzinnie Zadanie", "Czy wykonałeś codzienne zadanie?", [
+      Alert.alert("Codzienne Zadanie", "Czy wykonałeś codzienne zadanie?", [
         {
           text: "Nie",
           style: "cancel",
@@ -38,13 +49,13 @@ export default function Daily({}) {
           text: "Tak",
           onPress: async () => {
             try {
-              let response = await axios.post(
-                "https://projekt-server.vercel.app/addDoneQuest"
+              const response = await axios.post(
+                  "https://projekt-server-jacuxs-projects.vercel.app/addDoneQuest"
               );
-              console.log(response.data);
-              fetchData();
-            } catch (e) {
-              console.error(e);
+              console.log("Odpowiedź z addDoneQuest:", response.data);
+              fetchData(); // Pobierz aktualne dane
+            } catch (error) {
+              console.error("Błąd w onClick:", error);
             }
           },
         },
@@ -52,24 +63,24 @@ export default function Daily({}) {
     }
   };
 
+  // Obliczanie czasu do północy
   const calculateTime = () => {
     const now = new Date();
     const midnight = new Date();
     midnight.setHours(24, 0, 0, 0);
 
-    const remainingTime = midnight - now;
+    const remainingTime = Math.max(midnight - now, 0); // Zabezpieczenie przed wartością ujemną
 
     const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-    const minutes = Math.floor(
-      (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
-    );
+    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
     return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  // Aktualizacja czasu co sekundę
   useEffect(() => {
     const interval = setInterval(() => {
       setTime(calculateTime());
@@ -78,49 +89,53 @@ export default function Daily({}) {
     return () => clearInterval(interval);
   }, []);
 
+  // Pobieranie danych po zamontowaniu komponentu
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchDataAsync = async () => {
+      await fetchData();
+    };
+    setTime(fetchDataAsync, [1000]);
+  }, [authState]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
-        <Heading>Codzienne zadanie</Heading>
-        <View style={styles.streak}>
-          <Text style={styles.streakNumber}>2</Text>
-          <FontAwesome5 name="fire-alt" size={12} color="#fff" />
-        </View>
-      </View>
-      {finished === null ? (
-        <ActivityIndicator style={styles.indicator} size="big" color="#000" />
-      ) : (
-        <View style={styles.questContainer}>
-          <Text style={styles.heading}>
-            {finished ? "Dziękujemy!" : " Codzienne Zadanie"}
-          </Text>
-
-          {finished ? (
-            <Text style={styles.quest}>Jutro pojawi się nowe zadanie</Text>
-          ) : (
-            <Text style={styles.quest}>
-              Ogranicz spaliny. Do końca dnia nie używaj samochodu osobistego.
-            </Text>
-          )}
-
-          <View style={styles.buttonContainer}>
-            <Pressable style={styles.button} onPress={onClick}>
-              <Text style={styles.buttonText}>
-                {finished ? "Zadanie Wykonane!" : "Wykonałeś zadanie?"}
-              </Text>
-            </Pressable>
-            <View style={styles.timeContainer}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text style={styles.time}>{time}</Text>
-            </View>
+      <View style={styles.container}>
+        <View style={styles.row}>
+          <Heading>Codzienne zadanie</Heading>
+          <View style={styles.streak}>
+            <Text style={styles.streakNumber}>2</Text>
+            <FontAwesome5 name="fire-alt" size={12} color="#fff" />
           </View>
         </View>
-      )}
-    </View>
+        {finished === null ? (
+            <ActivityIndicator style={styles.indicator} size="large" color="#000" />
+        ) : (
+            <View style={styles.questContainer}>
+              <Text style={styles.heading}>
+                {finished ? "Dziękujemy!" : "Codzienne Zadanie"}
+              </Text>
+
+              {finished ? (
+                  <Text style={styles.quest}>Jutro pojawi się nowe zadanie</Text>
+              ) : (
+                  <Text style={styles.quest}>
+                    Ogranicz spaliny. Do końca dnia nie używaj samochodu osobistego.
+                  </Text>
+              )}
+
+              <View style={styles.buttonContainer}>
+                <Pressable style={styles.button} onPress={onClick}>
+                  <Text style={styles.buttonText}>
+                    {finished ? "Zadanie Wykonane!" : "Wykonałeś zadanie?"}
+                  </Text>
+                </Pressable>
+                <View style={styles.timeContainer}>
+                  <AntDesign name="clockcircleo" size={24} color="black" />
+                  <Text style={styles.time}>{time}</Text>
+                </View>
+              </View>
+            </View>
+        )}
+      </View>
   );
 }
 

@@ -7,7 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import { useState, useRef } from "react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "@/context/authContext";
 
 export default function Login({ navigation }) {
   const { onLogin } = useAuth();

@@ -2,10 +2,10 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   ScrollView,
   ActivityIndicator,
   Pressable,
+  Alert,
 } from "react-native";
 import Heading from "./heading";
 import { Dimensions } from "react-native";
@@ -14,12 +14,15 @@ import axios from "axios";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 const windowWidth = Dimensions.get("window").width;
-import aqiLevels from "../constant/aqiLevels";
+import aqiLevels from "@/constants/aqiLevels";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useAuth } from "../context/authContext";
+
 export default function Forecast({ openModal }) {
   const [ready, setIsReady] = useState(false);
   const [errorMessage, setError] = useState(null);
   const [forecastData, setForecastData] = useState([]);
+  const { authState } = useAuth();
 
   const fetchData = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -29,29 +32,38 @@ export default function Forecast({ openModal }) {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-
     let coords = location.coords;
+
     const pollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
     const forecastApi = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&hourly=temperature_2m&timezone=Europe%2FBerlin&forecast_days=1`;
 
     try {
       const pollution = await axios.get(pollutionUrl);
       const forecast = await axios.get(forecastApi);
+
+      console.log("Pollution Data:", pollution.data);
+      console.log("Forecast Data:", forecast.data);
+
       setIsReady(true);
 
       const date = new Date();
       const today = date.toDateString();
+
       const todayPollution = pollution.data.list.filter((item) => {
         const itemDate = new Date(item.dt * 1000);
-
         const itemDateString = itemDate.toDateString();
         const itemHour = itemDate.getHours();
 
         return (
-          (itemDateString === today && itemHour >= date.getHours()) ||
-          itemHour == 0
+            (itemDateString === today && itemHour >= date.getHours()) ||
+            itemHour === 0
         );
       });
+
+      if (todayPollution.length === 0) {
+        setError("Brak danych na dziś.");
+        return;
+      }
 
       const newData = todayPollution.map((item) => {
         const tempDate = new Date(item.dt * 1000).toISOString().slice(0, 16);
@@ -64,73 +76,87 @@ export default function Forecast({ openModal }) {
             };
           }
         }
-      });
+        return null;
+      }).filter(item => item !== null);
+
+      if (newData.length === 0) {
+        setError("Brak dopasowanych danych prognozy.");
+        return;
+      }
 
       setForecastData(newData);
     } catch (error) {
-      //console.error("Error fetching solar data:", error);
+      console.error("Error fetching data:", error);
+      setError("Nie udało się pobrać danych z serwera.");
+      Alert.alert("Błąd", "Nie udało się pobrać danych z serwera.");
     }
   };
+
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchDataAsync = async () => {
+      await fetchData();
+    };
+    setTimeout(fetchDataAsync, [1000]);
+  }, [authState]);
+
   if (errorMessage) {
     return (
-      <View style={styles.container}>
-        <Heading>Sprawdź czym oddychasz</Heading>
-        <Text>{errorMessage}</Text>
-      </View>
+        <View style={styles.container}>
+          <Heading>Sprawdź czym oddychasz</Heading>
+          <Text>{errorMessage}</Text>
+        </View>
     );
   } else {
     return (
-      <View style={styles.container}>
-        <Heading>Sprawdź czym oddychasz</Heading>
-        {ready ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.forecast}>
-              {forecastData.map((item, index) => {
-                if (item != null) {
-                  const date = new Date(item.dt * 1000);
-                  date.setHours(date.getHours() - 1);
-                  const formattedDate = date.toLocaleDateString("pl-PL", {
-                    day: "numeric",
-                    month: "long",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
+        <View style={styles.container}>
+          <Heading>Sprawdź czym oddychasz</Heading>
+          {ready ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.forecast}>
+                  {forecastData.length > 0 ? (
+                      forecastData.map((item, index) => {
+                        const date = new Date(item.dt * 1000);
+                        const formattedDate = date.toLocaleDateString("pl-PL", {
+                          day: "numeric",
+                          month: "long",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        });
 
-                  const aqi = aqiLevels[item.main.aqi - 1];
+                        const aqi = aqiLevels[item.main.aqi - 1];
 
-                  return (
-                    <Pressable
-                      onPress={() => openModal(forecastData[index].components)}
-                      key={index}
-                    >
-                      <View style={styles.forecastContainer}>
-                        <View style={styles.forecastHeader}>
-                          <AntDesign name="calendar" size={24} color="black" />
-                          <Text style={styles.date}>{formattedDate}</Text>
-                        </View>
-                        <View style={styles.forecastData}>
-                          <Text style={styles.temperature}>
-                            {item.temp + "°C" || "błąd"}
-                          </Text>
-                          <Text style={styles.forecastText}>
-                            Stan powietrza:
-                          </Text>
-                          <Text style={styles.forecastCondition}>{aqi}</Text>
-                        </View>
-                      </View>
-                    </Pressable>
-                  );
-                }
-              })}
-            </View>
-          </ScrollView>
-        ) : (
-          <ActivityIndicator size="small" color="#0000ff" />
-        )}
-      </View>
+                        return (
+                            <Pressable
+                                onPress={() => openModal(forecastData[index].components)}
+                                key={index}
+                            >
+                              <View style={styles.forecastContainer}>
+                                <View style={styles.forecastHeader}>
+                                  <AntDesign name="calendar" size={24} color="black" />
+                                  <Text style={styles.date}>{formattedDate}</Text>
+                                </View>
+                                <View style={styles.forecastData}>
+                                  <Text style={styles.temperature}>
+                                    {item.temp + "°C" || "błąd"}
+                                  </Text>
+                                  <Text style={styles.forecastText}>
+                                    Stan powietrza:
+                                  </Text>
+                                  <Text style={styles.forecastCondition}>{aqi}</Text>
+                                </View>
+                              </View>
+                            </Pressable>
+                        );
+                      })
+                  ) : (
+                      <Text>Brak danych do wyświetlenia.</Text>
+                  )}
+                </View>
+              </ScrollView>
+          ) : (
+              <ActivityIndicator size="small" color="#0000ff" />
+          )}
+        </View>
     );
   }
 }

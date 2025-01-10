@@ -1,45 +1,63 @@
 {
   "expo": {
-    "name": "projektg",
-    "slug": "projektg",
+    "name": "ecoboost",
+    "slug": "ecoboost",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "config": {
-"googleMaps": {
-  "apiKey": ""
-}
-      }
+        "googleMaps": {
+          "apiKey": "AIzaSyCPYG6I8OPIjyh9g8gfbkb766wPwH0CcN0"
+        }
+      },
+      "package": "com.jacuxik.ecoboost"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "plugins": [
+      "expo-router",
       [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
-      "expo-router"
-    ]
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3bd53c8d-201b-440c-a6c3-25ac8586a30f"
+      }
+    },
+    "owner": "jacuxior"
   }
 }

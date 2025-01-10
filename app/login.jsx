@@ -6,34 +6,39 @@ import {
   Button,
   Pressable,
 } from "react-native";
-import { useState } from "react";
-import { useAuth } from "../context/authContext";
+import { useState, useRef } from "react";
+import { useAuth } from "@/context/authContext";
+import {router} from "expo-router";
 
-export default function Register({ navigation }) {
-  const { onRegister } = useAuth();
+export default function Login({ navigation }) {
+  const { onLogin, authState } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [passsword, setPassword] = useState("");
   const [errorMessage, setError] = useState(null);
-
+  const canClick = useRef(true);
   const login = async () => {
-    if (password != "" && email != "") {
-      await onRegister(name, email, password);
-      setError(null);
+
+    if (!canClick.current) return;
+    console.log("click");
+    canClick.current = false;
+    if (passsword != "" && email != "") {
+      let response = await onLogin(email, passsword);
+      console.log(response);
+      if (response.status == false) {
+        setError(response.message);
+        canClick.current = true;
+      } else {
+        canClick.current = true
+        router.push("/");
+      }
     } else {
       setError("Pola muszą być wypełnione");
     }
   };
   return (
     <View style={styles.container}>
+      {/*Tu bedzie logo*/}
       <Text>EcoBoost</Text>
-      <TextInput
-        style={styles.input}
-        maxLength={255}
-        value={name}
-        placeholder="Imię"
-        onChangeText={(text) => setName(text)}
-      ></TextInput>
       <TextInput
         style={styles.input}
         maxLength={255}
@@ -44,16 +49,16 @@ export default function Register({ navigation }) {
       <TextInput
         style={styles.input}
         maxLength={255}
-        value={password}
+        value={passsword}
         placeholder="Hasło"
         onChangeText={(text) => setPassword(text)}
       ></TextInput>
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
       <Pressable style={styles.button} onPress={login}>
-        <Text style={styles.buttonText}>Zarejestruj się</Text>
+        <Text style={styles.buttonText}>Zaloguj się</Text>
       </Pressable>
-      <Pressable onPress={() => navigation.replace("login")}>
-        <Text>Zaloguj się</Text>
+      <Pressable onPress={() => router.push('/register')}>
+        <Text>Zarejestruj się</Text>
       </Pressable>
     </View>
   );

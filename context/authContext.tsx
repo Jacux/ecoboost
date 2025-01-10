@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import {router} from "expo-router";
 
 interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null };
@@ -11,7 +12,7 @@ interface AuthProps {
 
 const TOKEN_KEY = "my-jwt";
 
-export const API_URL = "https://projekt-server.vercel.app";
+export const API_URL = "https://projekt-server-jacuxs-projects.vercel.app";
 
 const AuthContext = createContext<AuthProps>({});
 
@@ -30,12 +31,15 @@ export const AuthProvider = ({ children }: any) => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
       console.log(token);
       if (token) {
+        console.log(token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         setAuthState({
           token: token,
           authenticated: true,
         });
+      } else {
+        router.push("/login");
       }
     };
     loadToken();

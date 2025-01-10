@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
-
+import {router} from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useState } from "react";
-export default function Header({ name, navigation }) {
+export default function Header({ name }) {
   return (
     <View style={styles.container}>
       <View style={styles.flex}>
         <Text style={styles.helloMessage}>Witaj {name}👋</Text>
         <Pressable
           style={styles.press}
-          onPress={() => navigation.navigate("settings")}
+          onPress={() => router.push("/settings")}
         >
           <Feather name="settings" size={24} color="black" />
         </Pressable>
