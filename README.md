@@ -1,50 +1,13 @@
-# Welcome to your Expo app 👋
+# Aplikacja została zbuildowana i jest możliwa do uruchomienia na androidzie używając pliku ecoboost.apk
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Instrukcja AWARYJNEGO uruchomienia aplikacji
 
-## Get started
+## Wymagania: Android Studio, Node.js
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Kroki instalacji i uruchomienia:
+1. Pobierz i zainstaluj repozytorium projektu. Upewnij się, że pliki projektu zostały poprawnie pobrane.
+2. Otwórz wiersz poleceń
+3. Zainstaluj wymagane zależności, wpisz w terminalu: "npm install"
+4. Uruchom wirtualne urządzenie w Android Studio
+5. Po zakończeniu instalacji zależności wpisz w terminalu: "npm run start"
+6. Po uruchomieniu Expo w terminalu, pojawi się interfejs Expo. Wpisz "a" aby połączyć aplikację z uruchomionym urządzeniem wirtualnym. Uwaga: Upewnij się, że aplikacja Expo Go jest uruchomiona na emulatorze.
