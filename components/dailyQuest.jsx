@@ -53,7 +53,7 @@ export default function Daily() {
                   "https://projekt-server-jacuxs-projects.vercel.app/addDoneQuest"
               );
               console.log("Odpowiedź z addDoneQuest:", response.data);
-              fetchData(); // Pobierz aktualne dane
+              fetchData();
             } catch (error) {
               console.error("Błąd w onClick:", error);
             }

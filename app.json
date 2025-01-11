@@ -21,7 +21,11 @@
           "apiKey": "AIzaSyCPYG6I8OPIjyh9g8gfbkb766wPwH0CcN0"
         }
       },
-      "package": "com.jacuxik.ecoboost"
+      "package": "com.jacuxikk.ecoboost",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -55,9 +59,8 @@
         "origin": false
       },
       "eas": {
-        "projectId": "3bd53c8d-201b-440c-a6c3-25ac8586a30f"
+        "projectId": "21d9e9c1-8fbb-43ff-9570-cad4d2e83b6d"
       }
-    },
-    "owner": "jacuxior"
+    }
   }
 }

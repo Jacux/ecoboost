@@ -25,6 +25,7 @@ export default function Forecast({ openModal }) {
   const { authState } = useAuth();
 
   const fetchData = async () => {
+    setError(null)
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       setError("Permission to access location was denied");
@@ -34,15 +35,13 @@ export default function Forecast({ openModal }) {
     let location = await Location.getCurrentPositionAsync({});
     let coords = location.coords;
 
-    const pollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
+    const pollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${coords.latitude}&lon=${coords.longitude}&appid=c90f2c2db18c785adf50d710a3441904`;
     const forecastApi = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&hourly=temperature_2m&timezone=Europe%2FBerlin&forecast_days=1`;
 
     try {
       const pollution = await axios.get(pollutionUrl);
       const forecast = await axios.get(forecastApi);
 
-      console.log("Pollution Data:", pollution.data);
-      console.log("Forecast Data:", forecast.data);
 
       setIsReady(true);
 
@@ -88,7 +87,7 @@ export default function Forecast({ openModal }) {
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Nie udało się pobrać danych z serwera.");
-      Alert.alert("Błąd", "Nie udało się pobrać danych z serwera.");
+      setTimeout(fetchData ,1000)
     }
   };
 
